@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>E-Commerce Portal</title>
+  <style>
+    :root{--accent:#0a74da;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, Arial, sans-serif;margin:0;color:#222;background:#f7f9fb}
+    header{background:#fff;border-bottom:1px solid #e6eef7;padding:12px 20px;position:sticky;top:0;z-index:10}
+    .nav{display:flex;align-items:center;gap:20px}
+    .brand{font-weight:700;color:var(--accent);font-size:1.1rem}
+    nav a{color:#333;text-decoration:none;padding:8px 10px;border-radius:6px}
+    nav a.active, nav a:hover{background:#eef6ff;color:var(--accent)}
+    .actions{margin-left:auto;display:flex;gap:10px}
+    button{border:0;background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer}
+    button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(10,116,218,0.12)}
+    main{max-width:1100px;margin:24px auto;padding:0 20px}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
+    .card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(20,40,80,0.03)}
+    h2{margin:0 0 12px 0}
+    .list{display:flex;flex-direction:column;gap:12px}
+    .item{display:flex;gap:12px;align-items:center}
+    .item img{width:64px;height:64px;object-fit:cover;border-radius:8px}
+    .meta{flex:1}
+    .meta small{color:var(--muted)}
+    .badge{background:#eef6ff;color:var(--accent);padding:4px 8px;border-radius:999px;font-size:12px}
+    form .row{display:flex;gap:10px;margin-bottom:10px}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(5,12,27,0.45);display:none;align-items:center;justify-content:center;padding:16px}
+    .modal{background:#fff;border-radius:12px;padding:18px;max-width:480px;width:100%}
+    label{display:block;font-size:13px;margin-bottom:6px}
+    input,textarea,select{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef7}
+    .error{color:#b00020;font-size:13px;margin-top:6px}
+    footer{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* Responsive */
+    @media(max-width:900px){.grid{grid-template-columns:1fr}.actions{display:none}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="brand">Trends</div>
+      <nav>
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#products" class="nav-link">Product Items</a>
+        <a href="#contact" class="nav-link">Contact Us</a>
+        <a href="#about" class="nav-link">About Us</a>
+      </nav>
+      <div class="actions">
+        <button id="open-login">Login</button>
+        <button class="ghost" id="open-register">Register</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="card">
+
+
+      <h2>Welcome to Trends</h2>
+      <p style="color:var(--muted)">Trends is your one-stop online shopping destination where fashion meets technology. From the latest gadgets to trendy outfits, we bring everything you love right to your fingertips. Our mission is to deliver quality products, secure payments, and a seamless shopping experience. Explore, shop, and stay ahead of the trends with us!</p>
+    </section>
+
+    <div class="grid" style="margin-top:16px">
+      <section id="products" class="card">
+        <h2>Product Items</h2>
+        <div class="list" id="product-list"></div>
+      </section>
+
+      <aside class="card">
+        <h2>Your Account</h2>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button id="view-orders" class="ghost">Orders</button>
+          <button id="view-wishlist" class="ghost">Wishlist</button>
+          <button id="view-reviews" class="ghost">Comments & Reviews</button>
+          <button id="view-custcare" class="ghost">Customer Care</button>
+          <button id="view-report" class="ghost">Report a Product</button>
+        </div>
+      </aside>
+    </div>
+
+    <section id="account-sections" style="margin-top:18px">
+      <!-- Orders -->
+      <div id="orders" class="card" style="display:none">
+        <h2>Orders List</h2>
+        <div id="orders-list" class="list"></div>
+      </div>
+
+      <!-- Wishlist -->
+      <div id="wishlist" class="card" style="display:none">
+        <h2>Wishlist</h2>
+        <div id="wishlist-list" class="list"></div>
+      </div>
+
+      <!-- Reviews -->
+      <div id="reviews" class="card" style="display:none">
+        <h2>Comments & Reviews</h2>
+        <div id="reviews-list" class="list"></div>
+        <hr style="margin:12px 0">
+        <h3>Add a review</h3>
+        <form id="review-form">
+          <label>Product
+            <select id="review-product"></select>
+          </label>
+          <label>Rating (1-5)
+            <input type="number" id="review-rating" min="1" max="5" value="5" />
+          </label>
+          <label>Comment
+            <textarea id="review-comment" rows="3"></textarea>
+          </label>
+          <div style="display:flex;gap:8px"><button type="submit">Submit Review</button><button type="button" id="cancel-review" class="ghost">Cancel</button></div>
+        </form>
+      </div>
+
+      <!-- Customer Care -->
+      <div id="custcare" class="card" style="display:none">
+        <h2>Customer Care</h2>
+        <p style="color:var(--muted)">Raise a query and our support team will respond .</p>
+        <form id="custcare-form">
+          <label>Full name <input id="cc-name" required /></label>
+          <label>Email <input id="cc-email" type="email" required /></label>
+          <label>Order ID (optional) <input id="cc-order" /></label>
+          <label>Message <textarea id="cc-message" rows="4" required></textarea></label>
+          <div style="display:flex;gap:8px"><button type="submit">Send</button><button type="button" id="reset-cc" class="ghost">Reset</button></div>
+        </form>
+        <hr style="margin:12px 0">
+        <h3>Previous requests</h3>
+        <div id="cc-list" class="list"></div>
+      </div>
+
+      <!-- Reporting -->
+      <div id="report" class="card" style="display:none">
+        <h2>Report a Product</h2>
+        <form id="report-form">
+          <label>Product <select id="report-product"></select></label>
+          <label>Issue <select id="report-issue"><option>Incorrect details</option><option>Damaged</option><option>Fraud / Seller policy</option><option>Other</option></select></label>
+          <label>Details <textarea id="report-details" rows="3"></textarea></label>
+          <div style="display:flex;gap:8px"><button type="submit">Submit Report</button><button type="button" id="cancel-report" class="ghost">Cancel</button></div>
+        </form>
+        <hr style="margin:12px 0">
+        <h3>Reports</h3>
+        <div id="report-list" class="list"></div>
+      </div>
+    </section>
+
+    <section id="contact" class="card" style="margin-top:18px">
+      <h2>Contact Us</h2>
+      <p>Email: Trends@gmail.com | Phone: +91 90039 09789</p>
+    </section>
+
+    <section id="about" class="card" style="margin-top:18px">
+      <h2>About Us</h2>
+      <p style="color:var(--muted)">Trends is an interactive web application designed to replicate the experience of an online shopping platform. It provides users with a clean, easy-to-use interface and demonstrates essential e-commerce functionalities.The portal allows users to browse through different product items, view order lists, manage their wishlist, and share comments and reviews on purchased items. It also includes a customer care section for submitting queries and a reporting feature to flag product-related issues.</p>
+    </section>
+  </main>
+
+  <footer>Shop at Trends©</footer>
+
+  <!-- Modals -->
+  <div id="modal" class="modal-backdrop">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+  <template id="login-template">
+    <h3>Login</h3>
+    <form id="login-form">
+      <label>Email <input id="login-email" type="email" required /></label>
+      <label>Password <input id="login-password" type="password" required /></label>
+      <div id="login-error" class="error" style="display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button type="submit">Login</button><button type="button" id="close-modal" class="ghost">Close</button></div>
+    </form>
+  </template>
+
+  <template id="register-template">
+    <h3>Register</h3>
+    <form id="register-form">
+      <label>Full name <input id="reg-name" required /></label>
+      <label>Email <input id="reg-email" type="email" required /></label>
+      <label>Phone <input id="reg-phone" required pattern="\d{10}" placeholder="10 digits" /></label>
+      <label>Password <input id="reg-password" type="password" required /></label>
+      <label>Confirm Password <input id="reg-password2" type="password" required /></label>
+      <div id="reg-error" class="error" style="display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button type="submit">Create Account</button><button type="button" id="close-modal-2" class="ghost">Close</button></div>
+    </form>
+  </template>
+
+  <script>
+    // Demo data
+    const products = [
+      {id:'P001',name:'Wireless Headphones',price:1999,img:'https://www.boat-lifestyle.com/cdn/shop/files/Artboard1_3d51df93-724a-4f08-b491-bd678fb6e8a4.png?v=1728873072'},
+      {id:'P002',name:'Smart Watch',price:3499,img:'https://www.leafstudios.in/cdn/shop/files/1_1099cd20-7237-4bdf-a180-b7126de5ef3d_800x.png?v=1722230645'},
+      {id:'P003',name:'Bluetooth Speaker',price:1299,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9cYWSaBNIhOPF2gguIun1olGtIYrHAlOO7w&s'}
+    ];
+
+    // Simple storage helpers
+    const DB = {
+      users: JSON.parse(localStorage.getItem('demo_users')||'[]'),
+      orders: JSON.parse(localStorage.getItem('demo_orders')||'[]'),
+      wishlist: JSON.parse(localStorage.getItem('demo_wishlist')||'[]'),
+      reviews: JSON.parse(localStorage.getItem('demo_reviews')||'[]'),
+      cc: JSON.parse(localStorage.getItem('demo_cc')||'[]'),
+      reports: JSON.parse(localStorage.getItem('demo_reports')||'[]')
+    };
+
+    // UI bindings
+    const productListEl = document.getElementById('product-list');
+    const ordersListEl = document.getElementById('orders-list');
+    const wishlistListEl = document.getElementById('wishlist-list');
+    const reviewsListEl = document.getElementById('reviews-list');
+    const ccListEl = document.getElementById('cc-list');
+    const reportListEl = document.getElementById('report-list');
+
+    function saveAll(){
+      localStorage.setItem('demo_users',JSON.stringify(DB.users));
+      localStorage.setItem('demo_orders',JSON.stringify(DB.orders));
+      localStorage.setItem('demo_wishlist',JSON.stringify(DB.wishlist));
+      localStorage.setItem('demo_reviews',JSON.stringify(DB.reviews));
+      localStorage.setItem('demo_cc',JSON.stringify(DB.cc));
+      localStorage.setItem('demo_reports',JSON.stringify(DB.reports));
+    }
+
+    // Render products
+    function renderProducts(){
+      productListEl.innerHTML='';
+      products.forEach(p=>{
+        const div=document.createElement('div');div.className='item';
+        div.innerHTML=`<img src="${p.img}" alt="${p.name}"><div class="meta"><div style=\"display:flex;justify-content:space-between;align-items:center\"><strong>${p.name}</strong><span class=\"badge\">₹${p.price}</span></div><small>ID: ${p.id}</small></div><div style=\"display:flex;flex-direction:column;gap:6px\"><button data-id=\"${p.id}\" class=\"add-wish\">Wishlist</button><button data-id=\"${p.id}\" class=\"add-order ghost\">Buy</button></div>`;
+        productListEl.appendChild(div);
+      });
+      // bind
+      document.querySelectorAll('.add-wish').forEach(btn=>btn.onclick=(e)=>{
+        const id=e.target.dataset.id; addToWishlist(id);
+      });
+      document.querySelectorAll('.add-order').forEach(btn=>btn.onclick=(e)=>{
+        const id=e.target.dataset.id; placeOrder(id);
+      });
+    }
+
+    // Wishlist
+    function addToWishlist(id){
+      const p = products.find(x=>x.id===id);
+      if(!p) return;
+      if(!DB.wishlist.find(x=>x.id===id)){
+        DB.wishlist.push({...p,addedAt:new Date().toISOString()}); saveAll(); renderWishlist(); alert('Added to wishlist')
+      } else alert('Already in wishlist')
+    }
+    function renderWishlist(){
+      wishlistListEl.innerHTML='';
+      DB.wishlist.forEach(w=>{
+        const div=document.createElement('div');div.className='item';
+        div.innerHTML=`<img src="${w.img}"><div class="meta"><strong>${w.name}</strong><small>Added: ${new Date(w.addedAt).toLocaleString()}</small></div><div><button data-id=\"${w.id}\" class=\"rem-wish ghost\">Remove</button></div>`;
+        wishlistListEl.appendChild(div);
+      });
+      wishlistListEl.querySelectorAll('.rem-wish').forEach(b=>b.onclick=e=>{const id=e.target.dataset.id;DB.wishlist=DB.wishlist.filter(x=>x.id!==id);saveAll();renderWishlist();});
+    }
+
+    // Orders
+    function placeOrder(id){
+      const p = products.find(x=>x.id===id);
+      if(!p) return;
+      const order = {orderId:'  ORD  '+Math.floor(Math.random()*90000+10000),productId:p.id,productName:p.name,amount:p.price,status:'Processing',date:new Date().toISOString()};
+      DB. orders . push( order ); saveAll(); renderOrders(); alert('Order placed');
+    }
+    function renderOrders(){
+      ordersListEl.innerHTML='';
+      DB.orders.forEach(o=>{
+        const div=document.createElement('div');div.className='item';
+        div.innerHTML=`<div class="meta"><strong>${o.productName}</strong><small>Order: ${o.orderId} • ${new Date(o.date).toLocaleString()}</small></div><div><span class=\"badge\">${o.status}</span></div>`;
+        ordersListEl.appendChild(div);
+      });
+    }
+
+    // Reviews
+    function renderReviews(){
+      reviewsListEl.innerHTML='';
+      DB.reviews.forEach(r=>{
+        const div=document.createElement('div');div.className='item';
+        div.innerHTML=`<div class="meta"><strong>${r.productName} — ${r.rating}/5</strong><small>${new Date(r.date).toLocaleString()}</small><div style=\"color:var(--muted);margin-top:6px\">${r.comment}</div></div>`;
+        reviewsListEl.appendChild(div);
+      });
+      // populate selects
+      const sel = document.getElementById('review-product'); const rpt = document.getElementById('report-product');
+      [sel,rpt].forEach(s=>{s.innerHTML='';products.forEach(p=>{s.innerHTML+=`<option value=\"${p.id}\">${p.name}</option>`})});
+    }
+
+    // Customer care
+    function renderCC(){
+      ccListEl.innerHTML='';
+      DB.cc.forEach(c=>{
+        const div=document.createElement('div');div.className='item';
+        div.innerHTML=`<div class=\"meta\"><strong>${c.name}</strong><small>${new Date(c.date).toLocaleString()} • ${c.email}</small><div style=\"color:var(--muted);margin-top:6px\">${c.message}</div></div>`;
+        ccListEl.appendChild(div);
+      });
+    }
+
+    // Reports
+    function renderReports(){
+      reportListEl.innerHTML='';
+      DB.reports.forEach(r=>{
+        const div=document.createElement('div');div.className='item';
+        div.innerHTML=`<div class=\"meta\"><strong>${r.productName}</strong><small>${r.issue} • ${new Date(r.date).toLocaleString()}</small><div style=\"color:var(--muted);margin-top:6px\">${r.details}</div></div>`;
+        reportListEl.appendChild(div);
+      });
+    }
+
+    // Modal helpers
+    const modalBackdrop = document.getElementById('modal');
+    const modalContent = document.getElementById('modal-content');
+    function openModal(templateId){
+      const tpl = document.getElementById(templateId);
+      modalContent.innerHTML = tpl.innerHTML;
+      modalBackdrop.style.display='flex';
+      // attach close
+      modalBackdrop.querySelectorAll('#close-modal,#close-modal-2').forEach(b=>b.onclick=closeModal);
+      modalBackdrop.onclick = (e)=>{if(e.target===modalBackdrop) closeModal();}
+    }
+    function closeModal(){ modalBackdrop.style.display='none'; modalContent.innerHTML=''; }
+
+    // Validation rules for registration
+    function validateRegistration(data){
+      const errors = [];
+      if(!data.name || data.name.trim().length<3) errors.push('Name must be at least 3 characters');
+      const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      if(!emailRe.test(data.email)) errors.push('Invalid email');
+      if(!/^\d{10}$/.test(data.phone)) errors.push('Phone must be 10 digits');
+      if(data.password.length < 6) errors.push('Password must be 6+ chars');
+      if(data.password !== data.password2) errors.push('Passwords do not match');
+      return errors;
+    }
+
+    // Auth demo (no real hashing)
+    function registerUser(ev){
+      ev.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const password2 = document.getElementById('reg-password2').value;
+      const errs = validateRegistration({name,email,phone,password,password2});
+      const errEl = document.getElementById('reg-error');
+      if(errs.length){ errEl.style.display='block'; errEl.textContent = errs.join(' • '); return; }
+      if(DB.users.find(u=>u.email===email)){ errEl.style.display='block'; errEl.textContent='User already exists with this email'; return; }
+      DB.users.push({name,email,phone,password,created:new Date().toISOString()}); saveAll(); errEl.style.display='none'; alert('Registration successful'); closeModal();
+    }
+
+    function loginUser(ev){
+      ev.preventDefault();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+      const u = DB.users.find(x=>x.email===email && x.password===password);
+      const el = document.getElementById('login-error');
+      if(!u){ el.style.display='block'; el.textContent='Invalid credentials'; return; }
+      el.style.display='none';
+      localStorage.setItem('demo_current_user',JSON.stringify({name:u.name,email:u.email}));
+      alert('Logged in as '+u.name);
+      closeModal();
+    }
+
+    // Bind modal events
+    document.getElementById('open-login').onclick = ()=>openModal('login-template');
+    document.getElementById('open-register').onclick = ()=>openModal('register-template');
+
+    // Delegated handling after modal open
+    modalBackdrop.addEventListener('submit', (e)=>{
+      if(e.target.id==='register-form') registerUser(e);
+      if(e.target.id==='login-form') loginUser(e);
+    });
+
+    // Account section toggles
+    function hideAllSections(){ ['orders','wishlist','reviews','custcare','report'].forEach(id=>document.getElementById(id).style.display='none'); }
+    document.getElementById('view-orders').onclick = ()=>{ hideAllSections(); document.getElementById('orders').style.display='block'; }
+    document.getElementById('view-wishlist').onclick = ()=>{ hideAllSections(); document.getElementById('wishlist').style.display='block'; }
+    document.getElementById('view-reviews').onclick = ()=>{ hideAllSections(); document.getElementById('reviews').style.display='block'; }
+    document.getElementById('view-custcare').onclick = ()=>{ hideAllSections(); document.getElementById('custcare').style.display='block'; }
+    document.getElementById('view-report').onclick = ()=>{ hideAllSections(); document.getElementById('report').style.display='block'; }
+
+    // Review submit
+    document.getElementById('review-form').addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const pid = document.getElementById('review-product').value;
+      const rating = parseInt(document.getElementById('review-rating').value)||5;
+      const comment = document.getElementById('review-comment').value.trim();
+      const p = products.find(x=>x.id===pid);
+      DB.reviews.push({productId:pid,productName:p.name,rating,comment,date:new Date().toISOString()}); saveAll(); renderReviews(); alert('Thanks for your review'); document.getElementById('review-form').reset();
+    });
+    document.getElementById('cancel-review').onclick = ()=>{ document.getElementById('review-form').reset(); }
+
+    // Customer care submit
+    document.getElementById('custcare-form').addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const name=document.getElementById('cc-name').value.trim();
+      const email=document.getElementById('cc-email').value.trim();
+      const order=document.getElementById('cc-order').value.trim();
+      const message=document.getElementById('cc-message').value.trim();
+      DB.cc.push({name,email,order,message,date:new Date().toISOString()}); saveAll(); renderCC(); alert('Query submitted'); e.target.reset();
+    });
+    document.getElementById('reset-cc').onclick = ()=>document.getElementById('custcare-form').reset();
+
+    // Report submit
+    document.getElementById('report-form').addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const pid=document.getElementById('report-product').value;
+      const issue=document.getElementById('report-issue').value;
+      const details=document.getElementById('report-details').value.trim();
+      const p = products.find(x=>x.id===pid);
+      DB.reports.push({productId:pid,productName:p.name,issue,details,date:new Date().toISOString()}); saveAll(); renderReports(); alert('Report submitted'); e.target.reset();
+    });
+    document.getElementById('cancel-report').onclick = ()=>document.getElementById('report-form').reset();
+
+    // Navigation highlight
+    document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click', (e)=>{ document.querySelectorAll('.nav-link').forEach(x=>x.classList.remove('active')); e.target.classList.add('active'); }));
+
+    // initial render
+    renderProducts(); renderWishlist(); renderOrders(); renderReviews(); renderCC(); renderReports();
+
+    // Expose some debug helpers to console (optional)
+    window._DB = DB; window.saveAll = saveAll;
+  </script>
+</body>
+</html>
